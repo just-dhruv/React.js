@@ -853,7 +853,7 @@ export default function Timer() {
             })
     useEffect(() => {
         const interval = setInterval(() => {
-        onTick();            
+          onTick();
         }, 1000)
         return () => {
             clearInterval(interval);
@@ -1921,8 +1921,175 @@ export default App
   </body>
 </html>
 
+<!-- REACT HOOK FORM library -->
+it is used to make form submission easy
 
+# simple form data getting useing register, handleSubmit
+## Form.jsx
+import { useForm } from 'react-hook-form'
 
+function Form() {
+    const { register, handleSubmit } = useForm();
+
+    console.log(useForm());
+
+    const onSubmit = (data) => {
+        console.log(data);
+    }
+    return (
+        <div className="p-5 flex justify-center text-center items-center">
+            <form action="" onSubmit={handleSubmit(onSubmit)} 
+                    className="border border-black p-5 rounded-xl"> // handleSumit is component of react-hook-form: used for form submitting
+                <label htmlFor="name">Name</label><br />
+                <input className="border" type="text" id="name" {...register('name')} />
+                <br /><br />
+                <label htmlFor="email">Email</label><br />
+                <input className="border" type="email" id="email" {...register('email')} />
+                <br /><br />
+                <label htmlFor="age">Age</label><br />
+                <input className="border" type="number" id="age" {...register('age')} />
+                <br /><br />
+
+                <button type="submit" className='border'>Submit</button>
+            </form>
+        </div>
+    )
+}
+
+export default Form
+
+## Form.jsx using the useRef()
+import { useForm } from 'react-hook-form'
+import { useRef } from 'react';
+function Form() {
+    const { register, handleSubmit } = useForm();
+    // using useRef
+    const message = useRef();
+    console.log(useForm());
+    const onSubmit = (data) => {
+        console.log(data);
+        console.log("message: ", message.current.value)
+    }
+    return (
+        <div className="p-5 flex justify-center text-center items-center">
+            <form action="" onSubmit={handleSubmit(onSubmit)}
+                    className="border border-black p-5 rounded-xl">
+                <label htmlFor="name">Name</label><br />
+                <input className="border" type="text" id="name" {...register('name')} />
+                <br /><br />
+                <label htmlFor="email">Email</label><br />
+                <input className="border" type="email" id="email" {...register('email')} />
+                <br /><br />
+                <label htmlFor="age">Age</label><br />
+                <input className="border" type="number" id="age" {...register('age')} />
+                <br /><br />
+
+                <input className="border" type="text"  ref={message}/>
+                <br /><br />
+
+                <button type="submit" className='border'>Submit</button>
+            </form>
+        </div>
+    )
+}
+export default Form
+
+## Form.jsx
+import { useForm } from 'react-hook-form'
+import { DevTool } from '@hookform/devtools'
+
+function Form() {
+    // const { register, handleSubmit, control, formState } = useForm({
+    //     defaultValues: async () => { // to add the default value from the API
+    //         const result = await fetch('https://jsonplaceholder.typicode.com/users/1');
+    //         const data = await result.json();
+    //         return {
+    //             name: data.name,
+    //             email: data.email,
+    //             age: 18
+    //         }
+    //     }
+    // });
+    const { register, handleSubmit, control, formState } = useForm({
+        defaultValues: {
+            name: ' Your name',
+            email: ' Your mail',
+            age:  18
+        }
+    });
+    const { errors } = formState;
+
+    console.log(useForm());
+
+    const onSubmit = (data) => {
+        console.log(data);
+    }
+    return (
+        <div className="p-5 flex justify-center text-center items-center">
+
+            <DevTool control={control} placement="top-left" />
+
+            <form action="" onSubmit={handleSubmit(onSubmit)}
+                className="border border-black p-5 rounded-xl">
+
+                <label htmlFor="name">Name</label><br />
+                <input className="border" type="text" id="name"
+                    {...register('name', {
+                        required: 'Name is required',
+                        validate: (value) => { // to add your custom validation
+                            return (
+                                value !== "Dhruv" || "enter different name"
+                            )
+                        }
+                    })} />
+                {errors.name && <p className='error'>{errors.name?.message}</p>}
+                <br /><br />
+
+                <label htmlFor="email">Email</label><br />
+                <input className="border" type="email" id="email" {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                        value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
+                        message: 'Invalid Email'
+                    },
+                    validate: { // you can add multiple validation for same field, just add the function as a object
+                        notAdmin: (value) => {
+                            return (
+                                value !== "admin@abc.com" || "enter different email"
+                            )
+                        },
+                        notYou: (value) => {
+                            return (
+                                !value.endsWith('@abc.com') || 'This domain is not allowed'
+                            )
+                        }
+                    }
+                })} />
+                {errors.email && <p className='error'>{errors.email?.message}</p>}
+                <br /><br />
+
+                <label htmlFor="age">Age</label><br />
+                <input className="border" type="number" id="age" {...register('age', {
+                    required: 'Age is required',
+                    valueAsDate: true,
+                    min: {
+                        value: 18,
+                        message: 'Age must be at least 18'
+                    },
+                    max: {
+                        value: 55,
+                        message: 'Age must me at most 55'
+                    }
+                })} />
+                {errors.age && <p className='error'>{errors.age?.message}</p>}
+                <br /><br />
+                <button type="submit" className='border'>Submit</button>
+            </form>
+        </div>
+    )
+}
+
+export default Form
 
 
 
